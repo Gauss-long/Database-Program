@@ -179,7 +179,22 @@ backend/.env
 DB_PORT=3306
 ```
 
-修改后重启 FastAPI 后端。如果 MySQL 服务本身也更改了监听端口，还需要修改 MySQL 配置并重启 MySQL。
+修改后重启 FastAPI 后端。
+
+如果 MySQL 服务本身也要更改监听端口，例如从 `3306` 改为 `3307`，则需要让 MySQL 启动在新的端口上。免安装版可以在启动命令中增加 `--port` 参数：
+
+```powershell
+cd C:\Users\86915\Desktop\mysql-8.0.46-winx64
+.\bin\mysqld.exe --console --port=3307 --basedir="C:\Users\86915\Desktop\mysql-8.0.46-winx64" --datadir="C:\Users\86915\Desktop\mysql-8.0.46-winx64\data"
+```
+
+然后同步修改后端配置：
+
+```env
+DB_PORT=3307
+```
+
+最后重启 FastAPI 后端。端口修改的核心原则是：MySQL 实际监听的端口必须和 `.env` 中的 `DB_PORT` 保持一致。
 
 ## 前端打开
 
