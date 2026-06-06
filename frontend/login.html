@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>登录 - 高校竞赛项目管理系统</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: "Microsoft YaHei", Arial, sans-serif;
+      color: #1f2937;
+      background: #edf3f8;
+    }
+    .shell {
+      width: min(920px, calc(100vw - 48px));
+      min-height: 520px;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      border: 1px solid #d5e0e8;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 18px 42px rgba(31, 41, 55, 0.12);
+    }
+    .intro {
+      padding: 54px;
+      color: #fff;
+      background: #15324a;
+    }
+    .intro h1 {
+      margin: 0 0 18px;
+      font-size: 32px;
+      line-height: 1.35;
+    }
+    .intro p {
+      margin: 0;
+      color: #d4e0e9;
+      line-height: 1.9;
+      font-size: 15px;
+    }
+    .tags {
+      display: grid;
+      gap: 10px;
+      margin-top: 34px;
+    }
+    .tag {
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 6px;
+      background: rgba(255,255,255,0.08);
+      color: #eef6fb;
+      font-size: 14px;
+    }
+    .form {
+      padding: 54px 46px;
+    }
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+    button {
+      height: 40px;
+      border: 0;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      background: #dbe7ef;
+      color: #15324a;
+    }
+    button.primary {
+      background: #1f7a8c;
+      color: #fff;
+    }
+    label {
+      display: block;
+      margin: 14px 0 7px;
+      color: #526170;
+      font-size: 13px;
+    }
+    input {
+      width: 100%;
+      height: 42px;
+      padding: 0 12px;
+      border: 1px solid #cbd7e0;
+      border-radius: 6px;
+      font-size: 15px;
+      outline: none;
+    }
+    .submit {
+      width: 100%;
+      margin-top: 24px;
+    }
+    .message {
+      min-height: 24px;
+      margin-top: 14px;
+      color: #b64b4b;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    @media (max-width: 760px) {
+      .shell { grid-template-columns: 1fr; }
+      .intro, .form { padding: 34px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="intro">
+      <h1>高校竞赛项目管理系统</h1>
+      <p>系统用于维护竞赛、项目、团队、学生、教师、成果和经费信息，支持项目管理、竞赛报名和项目统计查询。</p>
+
+    </section>
+    <section class="form">
+      <div class="tabs">
+        <button class="primary" id="loginTab">登录</button>
+        <button id="registerTab">注册</button>
+      </div>
+      <label for="username">用户名</label>
+      <input id="username" value="admin" />
+      <label for="password">密码</label>
+      <input id="password" type="password" value="123456" />
+      <button class="primary submit" id="submitBtn">登录系统</button>
+      <div class="message" id="message"></div>
+    </section>
+  </main>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:8000";
+    let mode = "login";
+    const $ = (id) => document.getElementById(id);
+
+    function setMode(next) {
+      mode = next;
+      $("loginTab").className = mode === "login" ? "primary" : "";
+      $("registerTab").className = mode === "register" ? "primary" : "";
+      $("submitBtn").textContent = mode === "login" ? "登录系统" : "注册账号";
+      $("message").textContent = "";
+    }
+
+    async function request(path, body) {
+      const res = await fetch(`${API_BASE}${path}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "请求失败");
+      return data;
+    }
+
+    async function submit() {
+      const username = $("username").value.trim();
+      const password = $("password").value.trim();
+      if (!username || !password) {
+        $("message").textContent = "请输入用户名和密码。";
+        return;
+      }
+      try {
+        const data = await request(`/api/auth/${mode}`, { username, password });
+        if (mode === "register") {
+          localStorage.setItem("currentUser", data.account.Username);
+          window.location.href = "index.html";
+          return;
+        }
+        localStorage.setItem("currentUser", data.account.Username);
+        window.location.href = "index.html";
+      } catch (err) {
+        $("message").textContent = err.message;
+      }
+    }
+
+    $("loginTab").addEventListener("click", () => setMode("login"));
+    $("registerTab").addEventListener("click", () => setMode("register"));
+    $("submitBtn").addEventListener("click", submit);
+  </script>
+</body>
+</html>
