@@ -27,10 +27,7 @@
       font-size: 21px;
       line-height: 1.45;
     }
-    .nav {
-      display: grid;
-      gap: 8px;
-    }
+    .nav { display: grid; gap: 8px; }
     .nav button, .logout {
       width: 100%;
       height: 40px;
@@ -84,9 +81,7 @@
       border-radius: 8px;
       box-shadow: 0 6px 18px rgba(31, 41, 55, 0.06);
     }
-    .card {
-      padding: 18px;
-    }
+    .card { padding: 18px; }
     .num {
       font-size: 30px;
       font-weight: 700;
@@ -108,7 +103,12 @@
     }
     .grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+      grid-template-columns: minmax(0, 1fr) minmax(360px, 0.75fr);
+      gap: 18px;
+    }
+    .two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 18px;
     }
     table {
@@ -136,19 +136,9 @@
       background: #dbe7ef;
       color: #15324a;
     }
-    button.primary {
-      background: #1f7a8c;
-      color: #fff;
-    }
-    button.danger {
-      background: #b64b4b;
-      color: #fff;
-    }
-    .ops {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+    button.primary { background: #1f7a8c; color: #fff; }
+    button.danger { background: #b64b4b; color: #fff; }
+    .ops { display: flex; gap: 8px; flex-wrap: wrap; }
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -177,16 +167,10 @@
       line-height: 1.7;
       font-size: 14px;
     }
-    .section {
-      display: none;
-    }
-    .section.active {
-      display: block;
-    }
-    @media (max-width: 980px) {
-      .page, .grid, .cards, .form-grid {
-        grid-template-columns: 1fr;
-      }
+    .section { display: none; }
+    .section.active { display: block; }
+    @media (max-width: 1100px) {
+      .page, .grid, .two, .cards, .form-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -196,9 +180,10 @@
       <h1>高校竞赛项目管理系统</h1>
       <div class="nav">
         <button class="active" data-section="home">首页看板</button>
+        <button data-section="people">人员管理</button>
+        <button data-section="teams">团队管理</button>
+        <button data-section="apply">项目申报</button>
         <button data-section="projects">项目管理</button>
-        <button data-section="registration">竞赛报名</button>
-        <button data-section="summary">项目统计</button>
       </div>
       <button class="logout" id="logoutBtn">退出登录</button>
     </aside>
@@ -216,84 +201,138 @@
           <div class="card"><div class="num" id="teamTotal">-</div><div class="label">团队数量</div></div>
           <div class="card"><div class="num" id="achievementTotal">-</div><div class="label">成果数量</div></div>
         </div>
-        <section class="panel">
-          <h3>项目状态分布</h3>
-          <table>
-            <thead><tr><th>状态</th><th>数量</th></tr></thead>
-            <tbody id="statusRows"></tbody>
-          </table>
-        </section>
-      </section>
-
-      <section class="section" id="projects">
-        <section class="panel">
-          <h3>项目管理</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>项目名称</th>
-                <th>类型</th>
-                <th>团队</th>
-                <th>教师</th>
-                <th>状态</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody id="projectRows"></tbody>
-          </table>
-          <div class="notice" id="projectNotice">删除项目会同时处理成果、经费和项目扩展记录。</div>
-        </section>
-      </section>
-
-      <section class="section" id="registration">
-        <div class="grid">
+        <div class="two">
           <section class="panel">
-            <h3>团队报名竞赛</h3>
-            <div class="form-grid">
-              <div>
-                <label for="teamSelect">报名团队</label>
-                <select id="teamSelect"></select>
-              </div>
-              <div>
-                <label for="competitionSelect">竞赛</label>
-                <select id="competitionSelect"></select>
-              </div>
-              <div>
-                <label for="registrationStatus">报名状态</label>
-                <input id="registrationStatus" value="已报名" />
-              </div>
-              <button class="primary" id="registerCompetitionBtn">提交报名</button>
-            </div>
-            <div class="notice" id="registrationNotice">提交报名时，数据库触发器会检查报名条件。</div>
+            <h3>项目状态分布</h3>
+            <table><thead><tr><th>状态</th><th>数量</th></tr></thead><tbody id="statusRows"></tbody></table>
           </section>
           <section class="panel">
-            <h3>触发器失败演示</h3>
-            <p class="notice">将报名状态清空后提交，触发器会阻止插入并返回错误。</p>
-            <button id="emptyStatusBtn">清空状态并提交</button>
+            <h3>最近项目</h3>
+            <table><thead><tr><th>项目名称</th><th>团队</th><th>状态</th></tr></thead><tbody id="recentRows"></tbody></table>
           </section>
         </div>
       </section>
 
-      <section class="section" id="summary">
+      <section class="section" id="people">
+        <div class="grid">
+          <section class="panel">
+            <h3>学生信息</h3>
+            <table>
+              <thead><tr><th>ID</th><th>姓名</th><th>学号</th><th>学院</th><th>专业</th></tr></thead>
+              <tbody id="studentRows"></tbody>
+            </table>
+          </section>
+          <section class="panel">
+            <h3>新增学生</h3>
+            <div class="form-grid">
+              <div><label>姓名</label><input id="studentName" /></div>
+              <div><label>学号</label><input id="studentNo" /></div>
+              <div><label>学院</label><input id="studentCollege" value="软件学院" /></div>
+              <div><label>专业</label><input id="studentMajor" value="软件工程" /></div>
+              <div><label>年级</label><input id="studentGrade" value="2023" /></div>
+              <button class="primary" id="createStudentBtn">新增学生</button>
+            </div>
+            <div class="notice" id="studentNotice"></div>
+          </section>
+        </div>
+        <div class="grid">
+          <section class="panel">
+            <h3>教师信息</h3>
+            <table>
+              <thead><tr><th>ID</th><th>姓名</th><th>工号</th><th>学院</th><th>职称</th></tr></thead>
+              <tbody id="teacherRows"></tbody>
+            </table>
+          </section>
+          <section class="panel">
+            <h3>新增教师</h3>
+            <div class="form-grid">
+              <div><label>姓名</label><input id="teacherName" /></div>
+              <div><label>工号</label><input id="teacherNo" /></div>
+              <div><label>学院</label><input id="teacherCollege" value="软件学院" /></div>
+              <div><label>职称</label><input id="teacherTitle" value="讲师" /></div>
+              <button class="primary" id="createTeacherBtn">新增教师</button>
+            </div>
+            <div class="notice" id="teacherNotice"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="section" id="teams">
+        <div class="grid">
+          <section class="panel">
+            <h3>团队列表</h3>
+            <table>
+              <thead><tr><th>ID</th><th>团队</th><th>负责人</th><th>人数</th><th>操作</th></tr></thead>
+              <tbody id="teamRows"></tbody>
+            </table>
+          </section>
+          <section class="panel">
+            <h3>创建团队 / 添加成员</h3>
+            <div class="form-grid">
+              <div><label>团队名称</label><input id="teamName" /></div>
+              <div><label>负责人</label><select id="leaderSelect"></select></div>
+              <button class="primary" id="createTeamBtn">创建团队</button>
+            </div>
+            <hr />
+            <div class="form-grid">
+              <div><label>团队</label><select id="memberTeamSelect"></select></div>
+              <div><label>学生</label><select id="memberStudentSelect"></select></div>
+              <button class="primary" id="addMemberBtn">添加成员</button>
+            </div>
+            <div class="notice" id="teamNotice"></div>
+          </section>
+        </div>
         <section class="panel">
-          <h3>项目综合统计</h3>
+          <h3>团队成员</h3>
+          <table>
+            <thead><tr><th>ID</th><th>姓名</th><th>学号</th><th>学院</th><th>专业</th></tr></thead>
+            <tbody id="memberRows"></tbody>
+          </table>
+        </section>
+      </section>
+
+      <section class="section" id="apply">
+        <div class="grid">
+          <section class="panel">
+            <h3>竞赛报名并创建项目</h3>
+            <div class="form-grid">
+              <div><label>项目名称</label><input id="competitionProjectName" /></div>
+              <div><label>团队</label><select id="competitionTeamSelect"></select></div>
+              <div><label>指导教师</label><select id="competitionTeacherSelect"></select></div>
+              <div><label>竞赛</label><select id="competitionSelect"></select></div>
+              <div><label>报名状态</label><input id="registrationStatus" value="已报名" /></div>
+              <button class="primary" id="createCompetitionProjectBtn">提交竞赛项目</button>
+            </div>
+            <div class="notice" id="competitionNotice">报名状态为空时，数据库触发器会阻止插入。</div>
+          </section>
+          <section class="panel">
+            <h3>科研项目申报</h3>
+            <div class="form-grid">
+              <div><label>项目名称</label><input id="researchProjectName" /></div>
+              <div><label>团队</label><select id="researchTeamSelect"></select></div>
+              <div><label>指导教师</label><select id="researchTeacherSelect"></select></div>
+              <div><label>项目来源</label><input id="researchSource" value="学院科研训练计划" /></div>
+              <div><label>科研级别</label><input id="researchLevel" value="院级" /></div>
+              <button class="primary" id="createResearchProjectBtn">提交科研项目</button>
+            </div>
+            <div class="notice" id="researchNotice"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="section" id="projects">
+        <section class="panel">
+          <h3>项目管理与统计</h3>
           <table>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>项目名称</th>
-                <th>类型</th>
-                <th>状态</th>
-                <th>团队</th>
-                <th>指导教师</th>
-                <th>成果数</th>
-                <th>经费总额</th>
+                <th>ID</th><th>项目名称</th><th>类型</th><th>团队</th><th>人数</th>
+                <th>指导教师</th><th>成果数</th><th>经费</th><th>状态</th><th>操作</th>
               </tr>
             </thead>
-            <tbody id="summaryRows"></tbody>
+            <tbody id="projectRows"></tbody>
           </table>
-          <div class="notice">本表数据来自数据库视图 v_ProjectSummary。</div>
+          <div class="notice" id="projectNotice">本表主要来自视图 v_ProjectSummary。</div>
         </section>
       </section>
     </main>
@@ -304,9 +343,7 @@
     const currentUser = localStorage.getItem("currentUser");
     const $ = (id) => document.getElementById(id);
 
-    if (!currentUser) {
-      window.location.href = "login.html";
-    }
+    if (!currentUser) window.location.href = "login.html";
     $("currentUser").textContent = currentUser || "";
 
     async function request(path, options = {}) {
@@ -317,6 +354,10 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "请求失败");
       return data;
+    }
+
+    function optionRows(rows, idKey, labelKey) {
+      return rows.map((row) => `<option value="${row[idKey]}">${row[labelKey]}</option>`).join("");
     }
 
     function showSection(id, title) {
@@ -338,19 +379,81 @@
       `).join("");
     }
 
+    async function loadPeople() {
+      const [students, teachers] = await Promise.all([
+        request("/api/people/students"),
+        request("/api/people/teachers"),
+      ]);
+      $("studentRows").innerHTML = students.map((row) => `
+        <tr><td>${row.UserID}</td><td>${row.UserName}</td><td>${row.StuNo}</td><td>${row.College || ""}</td><td>${row.Major || ""}</td></tr>
+      `).join("");
+      $("teacherRows").innerHTML = teachers.map((row) => `
+        <tr><td>${row.UserID}</td><td>${row.UserName}</td><td>${row.TeacherNo}</td><td>${row.College || ""}</td><td>${row.Title || ""}</td></tr>
+      `).join("");
+    }
+
+    async function loadTeams() {
+      const teams = await request("/api/teams");
+      $("teamRows").innerHTML = teams.map((row) => `
+        <tr>
+          <td>${row.TeamID}</td><td>${row.TeamName}</td><td>${row.LeaderName || ""}</td><td>${row.MemberCount}</td>
+          <td><button onclick="loadMembers(${row.TeamID})">查看成员</button></td>
+        </tr>
+      `).join("");
+    }
+
+    async function loadMembers(teamId) {
+      const rows = await request(`/api/teams/${teamId}/members`);
+      $("memberRows").innerHTML = rows.map((row) => `
+        <tr><td>${row.UserID}</td><td>${row.UserName}</td><td>${row.StuNo}</td><td>${row.College || ""}</td><td>${row.Major || ""}</td></tr>
+      `).join("");
+    }
+
+    async function loadLookups() {
+      const [students, teachers, teams, competitions] = await Promise.all([
+        request("/api/lookups/students"),
+        request("/api/lookups/teachers"),
+        request("/api/lookups/teams"),
+        request("/api/lookups/competitions"),
+      ]);
+      const studentOptions = optionRows(students, "UserID", "UserName");
+      const teacherOptions = optionRows(teachers, "UserID", "UserName");
+      const teamOptions = optionRows(teams, "TeamID", "TeamName");
+      $("leaderSelect").innerHTML = studentOptions;
+      $("memberStudentSelect").innerHTML = studentOptions;
+      $("memberTeamSelect").innerHTML = teamOptions;
+      $("competitionTeamSelect").innerHTML = teamOptions;
+      $("researchTeamSelect").innerHTML = teamOptions;
+      $("competitionTeacherSelect").innerHTML = teacherOptions;
+      $("researchTeacherSelect").innerHTML = teacherOptions;
+      $("competitionSelect").innerHTML = optionRows(competitions, "CompetitionID", "CompetitionName");
+    }
+
     async function loadProjects() {
-      const rows = await request("/api/projects");
+      const rows = await request("/api/statistics/project-summary");
+      $("recentRows").innerHTML = rows.slice(-5).reverse().map((row) => `
+        <tr><td>${row.ProjectName}</td><td>${row.TeamName || ""}</td><td>${row.ProjectStatus || ""}</td></tr>
+      `).join("");
       $("projectRows").innerHTML = rows.map((row) => `
         <tr>
           <td>${row.ProjectID}</td>
           <td>${row.ProjectName}</td>
           <td>${row.ProjectType || ""}</td>
           <td>${row.TeamName || ""}</td>
+          <td>${row.MemberCount}</td>
           <td>${row.TeacherName || ""}</td>
-          <td>${row.ProjectStatus || ""}</td>
+          <td>${row.AchievementCount}</td>
+          <td>${row.TotalFunding}</td>
+          <td>
+            <select id="status-${row.ProjectID}">
+              ${["进行中", "已完成", "已延期", "已终止"].map((item) =>
+                `<option value="${item}" ${item === row.ProjectStatus ? "selected" : ""}>${item}</option>`
+              ).join("")}
+            </select>
+          </td>
           <td>
             <div class="ops">
-              <button class="primary" onclick="updateStatus(${row.ProjectID})">更新状态</button>
+              <button class="primary" onclick="updateStatus(${row.ProjectID})">保存</button>
               <button class="danger" onclick="deleteProject(${row.ProjectID})">删除</button>
             </div>
           </td>
@@ -358,37 +461,114 @@
       `).join("");
     }
 
-    async function loadLookups() {
-      const [teams, competitions] = await Promise.all([
-        request("/api/lookups/teams"),
-        request("/api/lookups/competitions"),
-      ]);
-      $("teamSelect").innerHTML = teams.map((row) => `
-        <option value="${row.TeamID}">${row.TeamName}</option>
-      `).join("");
-      $("competitionSelect").innerHTML = competitions.map((row) => `
-        <option value="${row.CompetitionID}">${row.CompetitionName}</option>
-      `).join("");
-    }
-
-    async function loadSummary() {
-      const rows = await request("/api/statistics/project-summary");
-      $("summaryRows").innerHTML = rows.map((row) => `
-        <tr>
-          <td>${row.ProjectID}</td>
-          <td>${row.ProjectName}</td>
-          <td>${row.ProjectType || ""}</td>
-          <td>${row.ProjectStatus || ""}</td>
-          <td>${row.TeamName || ""}</td>
-          <td>${row.TeacherName || ""}</td>
-          <td>${row.AchievementCount}</td>
-          <td>${row.TotalFunding}</td>
-        </tr>
-      `).join("");
-    }
-
     async function refreshAll() {
-      await Promise.all([loadDashboard(), loadProjects(), loadLookups(), loadSummary()]);
+      await Promise.all([loadDashboard(), loadPeople(), loadTeams(), loadLookups(), loadProjects()]);
+    }
+
+    async function createStudent() {
+      try {
+        const data = await request("/api/people/students", {
+          method: "POST",
+          body: JSON.stringify({
+            user_name: $("studentName").value.trim(),
+            stu_no: $("studentNo").value.trim(),
+            college: $("studentCollege").value.trim(),
+            major: $("studentMajor").value.trim(),
+            grade: $("studentGrade").value.trim(),
+          }),
+        });
+        $("studentNotice").textContent = data.message;
+        await refreshAll();
+      } catch (err) { $("studentNotice").textContent = err.message; }
+    }
+
+    async function createTeacher() {
+      try {
+        const data = await request("/api/people/teachers", {
+          method: "POST",
+          body: JSON.stringify({
+            user_name: $("teacherName").value.trim(),
+            teacher_no: $("teacherNo").value.trim(),
+            college: $("teacherCollege").value.trim(),
+            title: $("teacherTitle").value.trim(),
+          }),
+        });
+        $("teacherNotice").textContent = data.message;
+        await refreshAll();
+      } catch (err) { $("teacherNotice").textContent = err.message; }
+    }
+
+    async function createTeam() {
+      try {
+        const data = await request("/api/teams", {
+          method: "POST",
+          body: JSON.stringify({
+            team_name: $("teamName").value.trim(),
+            leader_id: Number($("leaderSelect").value),
+          }),
+        });
+        $("teamNotice").textContent = data.message;
+        await refreshAll();
+      } catch (err) { $("teamNotice").textContent = err.message; }
+    }
+
+    async function addMember() {
+      try {
+        const teamId = Number($("memberTeamSelect").value);
+        const data = await request(`/api/teams/${teamId}/members`, {
+          method: "POST",
+          body: JSON.stringify({ student_id: Number($("memberStudentSelect").value) }),
+        });
+        $("teamNotice").textContent = data.message;
+        await refreshAll();
+        await loadMembers(teamId);
+      } catch (err) { $("teamNotice").textContent = err.message; }
+    }
+
+    async function createCompetitionProject() {
+      try {
+        const data = await request("/api/projects/competition", {
+          method: "POST",
+          body: JSON.stringify({
+            project_name: $("competitionProjectName").value.trim(),
+            team_id: Number($("competitionTeamSelect").value),
+            teacher_id: Number($("competitionTeacherSelect").value),
+            competition_id: Number($("competitionSelect").value),
+            registration_status: $("registrationStatus").value.trim(),
+          }),
+        });
+        $("competitionNotice").textContent = data.message;
+        await refreshAll();
+      } catch (err) { $("competitionNotice").textContent = err.message; }
+    }
+
+    async function createResearchProject() {
+      try {
+        const data = await request("/api/projects/research", {
+          method: "POST",
+          body: JSON.stringify({
+            project_name: $("researchProjectName").value.trim(),
+            team_id: Number($("researchTeamSelect").value),
+            teacher_id: Number($("researchTeacherSelect").value),
+            source: $("researchSource").value.trim(),
+            research_level: $("researchLevel").value.trim(),
+          }),
+        });
+        $("researchNotice").textContent = data.message;
+        await refreshAll();
+      } catch (err) { $("researchNotice").textContent = err.message; }
+    }
+
+    async function updateStatus(projectId) {
+      try {
+        const status = $(`status-${projectId}`).value;
+        const data = await request(`/api/projects/${projectId}/status`, {
+          method: "PUT",
+          body: JSON.stringify({ status }),
+        });
+        $("projectNotice").textContent = `项目 ${data.ProjectID} 状态已更新为：${data.ProjectStatus}`;
+        await refreshAll();
+      } catch (err) { $("projectNotice").textContent = err.message; }
     }
 
     async function deleteProject(projectId) {
@@ -397,45 +577,17 @@
         const data = await request(`/api/projects/${projectId}`, { method: "DELETE" });
         $("projectNotice").textContent = data.message;
         await refreshAll();
-      } catch (err) {
-        $("projectNotice").textContent = err.message;
-      }
-    }
-
-    async function updateStatus(projectId) {
-      try {
-        const data = await request(`/api/projects/${projectId}/status`, { method: "PUT" });
-        $("projectNotice").textContent = `项目 ${data.ProjectID} 状态已更新为：${data.ProjectStatus}`;
-        await refreshAll();
-      } catch (err) {
-        $("projectNotice").textContent = err.message;
-      }
-    }
-
-    async function createRegistration(forceEmptyStatus = false) {
-      const status = forceEmptyStatus ? "" : $("registrationStatus").value.trim();
-      try {
-        const data = await request("/api/registrations", {
-          method: "POST",
-          body: JSON.stringify({
-            team_id: Number($("teamSelect").value),
-            competition_id: Number($("competitionSelect").value),
-            status,
-          }),
-        });
-        $("registrationNotice").textContent = data.message;
-      } catch (err) {
-        $("registrationNotice").textContent = err.message;
-      }
+      } catch (err) { $("projectNotice").textContent = err.message; }
     }
 
     document.querySelectorAll(".nav button").forEach((btn) => {
       btn.addEventListener("click", () => {
         const titleMap = {
           home: "首页看板",
+          people: "人员管理",
+          teams: "团队管理",
+          apply: "项目申报",
           projects: "项目管理",
-          registration: "竞赛报名",
-          summary: "项目统计",
         };
         showSection(btn.dataset.section, titleMap[btn.dataset.section]);
       });
@@ -444,8 +596,12 @@
       localStorage.removeItem("currentUser");
       window.location.href = "login.html";
     });
-    $("registerCompetitionBtn").addEventListener("click", () => createRegistration(false));
-    $("emptyStatusBtn").addEventListener("click", () => createRegistration(true));
+    $("createStudentBtn").addEventListener("click", createStudent);
+    $("createTeacherBtn").addEventListener("click", createTeacher);
+    $("createTeamBtn").addEventListener("click", createTeam);
+    $("addMemberBtn").addEventListener("click", addMember);
+    $("createCompetitionProjectBtn").addEventListener("click", createCompetitionProject);
+    $("createResearchProjectBtn").addEventListener("click", createResearchProject);
 
     refreshAll();
   </script>

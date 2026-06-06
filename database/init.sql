@@ -166,7 +166,7 @@ BEGIN
     END IF;
 END//
 
-CREATE PROCEDURE sp_UpdateProjectStatus(IN p_project_id INT)
+CREATE PROCEDURE sp_UpdateProjectStatus(IN p_project_id INT, IN p_status VARCHAR(30))
 BEGIN
     DECLARE v_achievement_count INT DEFAULT 0;
     DECLARE v_total_funding DECIMAL(10, 2) DEFAULT 0;
@@ -177,24 +177,31 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '项目不存在，无法更新状态';
     END IF;
 
-    SELECT COUNT(*)
-    INTO v_achievement_count
-    FROM Achievement
-    WHERE ProjectID = p_project_id;
-
-    SELECT IFNULL(SUM(Amount), 0)
-    INTO v_total_funding
-    FROM Funding
-    WHERE ProjectID = p_project_id;
-
-    IF v_achievement_count > 0 AND v_total_funding > 0 THEN
+    IF p_status IS NOT NULL AND p_status <> '' THEN
         UPDATE Project
-        SET ProjectStatus = '已完成'
+        SET ProjectStatus = p_status
         WHERE ProjectID = p_project_id;
     ELSE
-        UPDATE Project
-        SET ProjectStatus = '进行中'
+
+        SELECT COUNT(*)
+        INTO v_achievement_count
+        FROM Achievement
         WHERE ProjectID = p_project_id;
+
+        SELECT IFNULL(SUM(Amount), 0)
+        INTO v_total_funding
+        FROM Funding
+        WHERE ProjectID = p_project_id;
+
+        IF v_achievement_count > 0 AND v_total_funding > 0 THEN
+            UPDATE Project
+            SET ProjectStatus = '已完成'
+            WHERE ProjectID = p_project_id;
+        ELSE
+            UPDATE Project
+            SET ProjectStatus = '进行中'
+            WHERE ProjectID = p_project_id;
+        END IF;
     END IF;
 END//
 
@@ -208,10 +215,12 @@ SELECT
     p.ProjectStatus,
     t.TeamName,
     u.UserName AS TeacherName,
+    COUNT(DISTINCT pa.StudentID) AS MemberCount,
     COUNT(DISTINCT a.AchievementID) AS AchievementCount,
     IFNULL(SUM(DISTINCT f.Amount), 0) AS TotalFunding
 FROM Project p
 LEFT JOIN Team t ON p.TeamID = t.TeamID
+LEFT JOIN Participate pa ON t.TeamID = pa.TeamID
 LEFT JOIN Teacher te ON p.TeacherID = te.UserID
 LEFT JOIN Users u ON te.UserID = u.UserID
 LEFT JOIN Achievement a ON p.ProjectID = a.ProjectID

@@ -53,13 +53,13 @@ INSERT INTO Registration (TeamID, CompetitionID, RegisterTime, Status)
 VALUES (2, 1, CURDATE(), '已报名');
 
 -- 8. 存储过程更新演示：根据成果和经费情况更新项目状态
-CALL sp_UpdateProjectStatus(1);
+CALL sp_UpdateProjectStatus(1, '已完成');
 SELECT ProjectID, ProjectName, ProjectStatus
 FROM Project
 WHERE ProjectID = 1;
 
 -- 8.1 存储过程失败演示：项目不存在时，存储过程主动报错
-CALL sp_UpdateProjectStatus(999);
+CALL sp_UpdateProjectStatus(999, '已完成');
 
 -- 9. 视图查询演示：查询项目综合信息
 SELECT *
